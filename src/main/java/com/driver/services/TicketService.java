@@ -40,9 +40,40 @@ public class TicketService {
         //throw new Exception("Invalid stations");
         //Save the bookedTickets in the train Object
         //Also in the passenger Entity change the attribute bookedTickets by using the attribute bookingPersonId.
-       //And the end return the ticketId that has come from db
+        //And the end return the ticketId that has come from db
+        Train train=trainRepository.findById(bookTicketEntryDto.getTrainId()).get();
+        List<Ticket> bookedTickets=train.getBookedTickets();
+        int seatsOccupied=0;
+        for(Ticket ticket:bookedTickets){
+            seatsOccupied+=ticket.getPassengersList().size();
+        }
+        int totalSeats= train.getNoOfSeats();
+        int seatsLeft=totalSeats-seatsOccupied;
+        if(seatsLeft<bookTicketEntryDto.getNoOfSeats()) throw new Exception("Less tickets are available");
+        if(!train.getRoute().contains(bookTicketEntryDto.getFromStation().name()) || !train.getRoute().contains(bookTicketEntryDto.getToStation().name())){
+            throw new Exception("Invalid stations");
+        }
 
-       return null;
+        train.setNoOfSeats(seatsLeft);
+        Ticket ticket=new Ticket();
+        ticket.setTrain(train);
+        ticket.setFromStation(bookTicketEntryDto.getFromStation());
+        ticket.setToStation(bookTicketEntryDto.getToStation());
+        int total_fare=(ticket.getToStation().getStationNo()-ticket.getFromStation().getStationNo())*300;
+        ticket.setTotalFare(total_fare);
+        List<Integer> passengerIds=bookTicketEntryDto.getPassengerIds();
+        List<Passenger> passengerList=new ArrayList<>();
+        for(int id:passengerIds){
+            Passenger passenger=passengerRepository.findById(id).get();
+            passengerList.add(passenger);
+        }
+        ticket.setPassengersList(passengerList);
+        Passenger p=passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
+        p.getBookedTickets().add(ticket);
+
+
+        trainRepository.save(train);
+       return 5;
 
     }
 }
