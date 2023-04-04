@@ -73,7 +73,7 @@ public class TicketService {
 
 
         trainRepository.save(train);
-       return 5;
+       return ticket.getTicketId();
 
     }
 }
