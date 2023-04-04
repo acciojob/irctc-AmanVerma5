@@ -56,7 +56,6 @@ public class TicketService {
 
         train.setNoOfSeats(seatsLeft);
         Ticket ticket=new Ticket();
-        ticket.setTrain(train);
         ticket.setFromStation(bookTicketEntryDto.getFromStation());
         ticket.setToStation(bookTicketEntryDto.getToStation());
         int total_fare=(ticket.getToStation().getStationNo()-ticket.getFromStation().getStationNo())*300;
@@ -71,6 +70,7 @@ public class TicketService {
         Passenger p=passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
         p.getBookedTickets().add(ticket);
 
+        ticket.setTrain(train);
         ticket=ticketRepository.save(ticket);
         train.getBookedTickets().add(ticket);
         trainRepository.save(train);
