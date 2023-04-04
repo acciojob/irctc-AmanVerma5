@@ -42,19 +42,14 @@ public class TicketService {
         //Also in the passenger Entity change the attribute bookedTickets by using the attribute bookingPersonId.
         //And the end return the ticketId that has come from db
         Train train=trainRepository.findById(bookTicketEntryDto.getTrainId()).get();
-        List<Ticket> bookedTickets=train.getBookedTickets();
-        int seatsOccupied=0;
-        for(Ticket ticket:bookedTickets){
-            seatsOccupied+=ticket.getPassengersList().size();
+        if(train.getNoOfSeats() - train.getBookedTickets().size() < bookTicketEntryDto.getNoOfSeats()){
+            throw new Exception("Less tickets are available");
         }
-        int totalSeats= train.getNoOfSeats();
-        int seatsLeft=totalSeats-seatsOccupied;
-        if(seatsLeft<bookTicketEntryDto.getNoOfSeats()) throw new Exception("Less tickets are available");
         if(!train.getRoute().contains(bookTicketEntryDto.getFromStation().name()) || !train.getRoute().contains(bookTicketEntryDto.getToStation().name())){
             throw new Exception("Invalid stations");
         }
 
-        train.setNoOfSeats(seatsLeft);
+
         Ticket ticket=new Ticket();
         ticket.setFromStation(bookTicketEntryDto.getFromStation());
         ticket.setToStation(bookTicketEntryDto.getToStation());
