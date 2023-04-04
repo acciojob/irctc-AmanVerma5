@@ -71,6 +71,7 @@ public class TicketService {
         Passenger p=passengerRepository.findById(bookTicketEntryDto.getBookingPersonId()).get();
         p.getBookedTickets().add(ticket);
 
+        ticket=ticketRepository.save(ticket);
 
         trainRepository.save(train);
        return ticket.getTicketId();
